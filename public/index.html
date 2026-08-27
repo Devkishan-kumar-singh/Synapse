@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synapse — The AI Prompt Version Control Hub</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+          <circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+          <circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M8.2 7.2L15.8 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M8.2 16.8L15.8 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Synapse</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#features" class="nav-link dropdown">Features
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </a>
+        <a href="#arena" class="nav-link">A/B Testing Arena</a>
+        <a href="#docs" class="nav-link">Docs</a>
+        <a href="login.html" class="nav-link">Team Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1>Master Your LLM Workflows.<br>Synapse: The AI Prompt<br>Version Control Hub.</h1>
+        <p class="hero-sub">
+          Manage, Test, &amp; Version Control Prompts for Teams.<br>
+          Optimize LLM Outputs with Collaborative A/B Testing.
+        </p>
+        <div class="hero-actions">
+          <a href="#arena" class="btn btn-primary">Launch A/B Arena</a>
+          <a href="#demo" class="btn btn-outline">Request Demo</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="app-window">
+
+          <div class="app-topbar">
+            <div class="app-topbar-left">
+              <svg class="app-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+                <circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+                <circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M8.2 7.2L15.8 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M8.2 16.8L15.8 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              <span>Synapse</span>
+            </div>
+            <div class="app-search">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span>v7 / branch-app</span>
+            </div>
+            <div class="app-topbar-right">
+              <span class="icon-chip">⌘K</span>
+              <span class="icon-dot">?</span>
+              <span class="icon-dot">🔔</span>
+              <span class="avatar"></span>
+            </div>
+          </div>
+
+          <div class="app-body">
+            <div class="app-body-header">
+              <span class="branch-tag">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.2" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="18" r="2.2" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="12" r="2.2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7L16 11" stroke="currentColor" stroke-width="1.8"/><path d="M8 17L16 13" stroke="currentColor" stroke-width="1.8"/></svg>
+                main
+              </span>
+              <span class="branch-title">Main Branch</span>
+              <button class="btn-mini">Export Demo</button>
+            </div>
+
+            <div class="app-panels">
+              <div class="code-panel">
+                <div class="code-panel-head">
+                  <span>Prompt</span>
+                  <span class="code-icons">↩ ⧉ ⋯</span>
+                </div>
+                <pre class="code-lines"><span class="ln">1</span><span class="kw">prompt</span> (v3) <span class="str">Refined_prompt</span>;
+<span class="ln">2</span>
+<span class="ln">3</span> <span class="kw">function</span> <span class="fn">buildComplexPrompt</span>() {
+<span class="ln">4</span>   {tone};
+<span class="ln">5</span>   ${target} = (voice);
+<span class="ln">6</span> }
+<span class="ln">7</span>
+<span class="ln">8</span> <span class="kw">prompt</span> <span class="fn">callDeepResearchTool</span>() {
+<span class="ln">9</span>   <span class="fn">execute</span>(<span class="str">"Query1"</span>)
+<span class="ln">10</span> }
+<span class="ln">11</span>
+<span class="ln">12</span> <span class="kw">prompt</span> <span class="fn">callDataQueryTools</span>() {
+<span class="ln">13</span>   <span class="fn">extend</span>(<span class="str">"Query2"</span>)
+<span class="ln">14</span> }
+<span class="ln">15</span>
+<span class="ln">16</span> <span class="comment">// v3 Format Branch</span></pre>
+              </div>
+
+              <div class="results-col">
+                <div class="result-card result-blue">
+                  <div class="result-head">
+                    <span class="model-dot"></span>
+                    <span>GPT-4o</span>
+                  </div>
+                  <p>API Foundations lead the framework toward a broader adaptive strategy. It communicates the abstract concept clearly, while offering a modular pathway for the team&rsquo;s IMB workspace.</p>
+                </div>
+                <div class="result-card result-red">
+                  <div class="result-head">
+                    <span>Claude 3.5 Sonnet</span>
+                  </div>
+                  <p>Claude&rsquo;s response is efficient and direct, capturing the intended structure with a slightly more compact and pragmatic tone across the same output frame.</p>
+                </div>
+                <div class="result-card result-blue small">
+                  <p>Get 4-6 responses to compare, iterate, and refine side by side before promoting the winning variant to production.</p>
+                </div>
+                <div class="result-card result-red small">
+                  <p>Claude 3.5 Sonnet trims the response further, preserving the core intent while cutting redundant framing text.</p>
+                </div>
+                <div class="result-actions">
+                  <button class="pill pill-blue">Commit</button>
+                  <button class="pill pill-red">Discard</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="app-footer">
+              <span class="avatar small"></span>
+              <span class="footer-chip">v2.1</span>
+              <span class="footer-text">Track diffs &amp; roll back anytime</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="features-inner">
+      <h2>Features Section</h2>
+      <p class="features-kicker">Everything your team needs to treat prompts like production code.</p>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="18" r="2.4" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="12" r="2.4" stroke="currentColor" stroke-width="1.8"/><path d="M8.2 7L15.8 11" stroke="currentColor" stroke-width="1.8"/><path d="M8.2 17L15.8 13" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <h3>Code Branching</h3>
+          <p>Manage different prompt iterations like software code. Create, commit, merge, and rollback prompt versions to maintain quality.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V5m0 14h6M4 5h6m10 14V9m0 10h-6m6-10h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <h3>A/B Testing Arena</h3>
+          <p>Directly compare prompt variations against live inputs from GPT-4o, Claude 3.5 Sonnet, and other models side-by-side.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.2" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="6" r="2.2" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="18" r="2.2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7L16 7" stroke="currentColor" stroke-width="1.8"/><path d="M7 8L11 16" stroke="currentColor" stroke-width="1.8"/><path d="M17 8L13 16" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <h3>Variable Injection</h3>
+          <p>Build reusable prompt templates with dynamic variables like {{tone}}, {{target_user}}, and {{output_format}} for team-wide use.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="2.6" stroke="currentColor" stroke-width="1.8"/><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="9" r="2.2" stroke="currentColor" stroke-width="1.8"/><path d="M14 19c0-2.2 1.7-4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Team Collaboration</h3>
+          <p>Share prompt libraries with your team. Assign roles, control access, and track who made what changes for secure collaboration.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <h3>Secure Access</h3>
+          <p>Implement role-based authentication and access controls to safeguard sensitive project data and API keys.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="16" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Audit Logs</h3>
+          <p>Maintain a complete history of prompt changes and deployments. Track performance metrics over time for compliance and optimization.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>&copy; 2026 Synapse. Version control for the way teams actually ship prompts.</span>
+    </div>
+  </footer>
+
+</body>
+</html>

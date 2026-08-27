@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workspace — Synapse</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M8.2 7.2L15.8 11M8.2 16.8L15.8 13" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Synapse</span>
+      </a>
+      <nav class="nav-links dashboard-nav">
+        <span id="role-badge" class="role-badge"></span>
+        <span id="user-email"></span>
+        <a href="#" id="logout-link" class="nav-link">Log Out</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="workspace-header">
+      <div><p class="eyebrow" id="team-name">Workspace</p><h1>Prompt projects</h1><p>Build, version, and test production prompts with your team.</p></div>
+      <button id="new-prompt-button" class="btn btn-primary hidden">New prompt</button>
+    </section>
+
+    <section id="new-prompt-panel" class="workspace-panel hidden">
+      <div class="panel-heading"><h2>Create prompt project</h2><button class="icon-button" data-close="new-prompt-panel" aria-label="Close">×</button></div>
+      <form id="new-prompt-form" class="inline-form">
+        <label>Project name<input id="prompt-name" maxlength="120" required placeholder="Customer support assistant"></label>
+        <label>Description<input id="prompt-description" maxlength="300" placeholder="Purpose of this prompt"></label>
+        <button class="btn btn-primary" type="submit">Create project</button>
+      </form>
+      <p id="prompt-message" class="auth-msg"></p>
+    </section>
+
+    <section id="admin-panel" class="workspace-panel hidden">
+      <div class="panel-heading"><div><h2>Invite team member</h2><p>Only administrators can invite people and assign roles.</p></div></div>
+      <form id="invite-form" class="invite-grid">
+        <label>Full name<input id="invite-name" required maxlength="100" placeholder="Alex Morgan"></label>
+        <label>Email<input id="invite-email" type="email" required placeholder="alex@company.com"></label>
+        <label>Role<select id="invite-role"><option value="prompt_engineer">Prompt Engineer</option><option value="tester">Tester</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select></label>
+        <button class="btn btn-outline" type="submit">Send invitation</button>
+      </form>
+      <p id="invite-message" class="auth-msg"></p>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>All projects</h2><span id="project-count">0 projects</span></div>
+      <div id="prompts-list" class="project-grid"><div class="empty-state">Loading your workspace…</div></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
