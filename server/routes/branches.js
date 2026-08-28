@@ -50,12 +50,20 @@ router.post('/', requireRole('admin', 'prompt_engineer'), async (req, res) => {
   if (!prompt) return res.status(404).json({ error: 'Prompt not found.' });
   let sourceBranchId = null;
   if (from_commit_id) {
-    const source = await getCommitForTeam(from_commit_id, req.user.team_id);
-    const sourceBranch = Array.isArray(source?.branches) ? source.branches[0] : source?.branches;
-    if (!sourceBranch || sourceBranch.prompt_id !== prompt_id) {
+    const { data: sourceCommit } = await supabase.from('commits')
+      .select('branch_id').eq('id', from_commit_id).maybeSingle();
+    if (!sourceCommit) return res.status(400).json({ error: 'Source commit was not found.' });
+
+    const { data: sourceBranch } = await supabase.from('branches')
+      .select('id, prompt_id, prompts!inner(team_id)')
+      .eq('id', sourceCommit.branch_id)
+      .eq('prompt_id', prompt_id)
+      .eq('prompts.team_id', req.user.team_id)
+      .maybeSingle();
+    if (!sourceBranch) {
       return res.status(400).json({ error: 'Source commit does not belong to this prompt.' });
     }
-    sourceBranchId = source.branch_id;
+    sourceBranchId = sourceBranch.id;
   }
 
   const { data, error } = await supabase
