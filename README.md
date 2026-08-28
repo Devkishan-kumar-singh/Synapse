@@ -2,6 +2,8 @@
 
 Synapse is an email-OTP prompt version-control and A/B testing workspace. Anyone can create an account; every new user receives an isolated private workspace and becomes its first Admin.
 
+The workspace includes a branch-aware prompt editor, immutable commit history, rollback controls, and a real-time team chat drawer with workspace and project conversation scopes.
+
 ## Access model
 
 | Role | Access |
@@ -54,6 +56,16 @@ npm start
 
 Open `http://localhost:5000`. Every visitor sees the main page first. Invited team members can use **Team Login** to access the workspace.
 
+## Upgrade an existing database
+
+If the original Synapse schema is already running, do not run `schema.sql` again. Run each file in `migrations/` once, in filename order. For the collaboration release, run:
+
+```text
+migrations/002_collaboration.sql
+```
+
+This adds team/project chat, its security policy, indexes, and Supabase Realtime publication. Existing users, teams, prompts, and roles are preserved.
+
 ## Deploy on Render
 
 1. Push the project to a private GitHub repository. Never commit `.env`.
@@ -88,6 +100,8 @@ The service-role and LLM keys must remain server-side. Never place them in `publ
 - Security headers, API rate limiting, restricted CORS, and request-size limits
 - Safe DOM rendering for project content
 - Audit records for team invitations and version-control activity
+- Team-scoped real-time chat with safe text rendering
+- Project ownership checks for project-specific conversations
 
 ## Validation
 

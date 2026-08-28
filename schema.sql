@@ -89,11 +89,22 @@ create table public.audit_logs (
   created_at timestamptz not null default now()
 );
 
+create table public.chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  team_id uuid not null references public.teams(id) on delete cascade,
+  sender_id uuid not null references public.profiles(id) on delete cascade,
+  project_id uuid references public.prompts(id) on delete cascade,
+  body text not null check (char_length(trim(body)) between 1 and 2000),
+  created_at timestamptz not null default now()
+);
+
 create index prompts_team_idx on public.prompts(team_id, created_at desc);
 create index branches_prompt_idx on public.branches(prompt_id);
 create index commits_branch_idx on public.commits(branch_id, created_at desc);
 create index test_runs_team_idx on public.test_runs(team_id, created_at desc);
 create index audit_logs_team_idx on public.audit_logs(team_id, created_at desc);
+create index chat_messages_team_created_idx on public.chat_messages(team_id, created_at desc);
+create index chat_messages_project_created_idx on public.chat_messages(project_id, created_at desc);
 
 -- Only server-generated invitations carry trusted app_metadata. The trigger
 -- creates a profile when an invited user is added to Supabase Auth.
@@ -130,6 +141,7 @@ alter table public.commits enable row level security;
 alter table public.variables enable row level security;
 alter table public.test_runs enable row level security;
 alter table public.audit_logs enable row level security;
+alter table public.chat_messages enable row level security;
 
 create or replace function public.current_team_id()
 returns uuid language sql security definer stable set search_path = public
@@ -157,6 +169,10 @@ create policy "members view team tests" on public.test_runs for select
   using (team_id = public.current_team_id());
 create policy "members view team audit" on public.audit_logs for select
   using (team_id = public.current_team_id());
+create policy "members view team chat" on public.chat_messages for select
+  using (team_id = public.current_team_id());
+
+alter publication supabase_realtime add table public.chat_messages;
 
 revoke all on function public.handle_invited_user() from public;
 grant execute on function public.current_team_id() to authenticated;

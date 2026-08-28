@@ -10,53 +10,41 @@
 <body>
   <header class="navbar">
     <div class="nav-inner">
-      <a href="index.html" class="brand">
-        <svg class="brand-icon" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M8.2 7.2L15.8 11M8.2 16.8L15.8 13" stroke="currentColor" stroke-width="1.6"/></svg>
-        <span>Synapse</span>
-      </a>
-      <nav class="nav-links dashboard-nav">
-        <span id="role-badge" class="role-badge"></span>
-        <span id="user-email"></span>
-        <a href="#" id="logout-link" class="nav-link">Log Out</a>
-      </nav>
+      <a href="index.html" class="brand"><svg class="brand-icon" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M8.2 7.2L15.8 11M8.2 16.8L15.8 13" stroke="currentColor" stroke-width="1.6"/></svg><span>Synapse</span></a>
+      <nav class="nav-links dashboard-nav"><span id="role-badge" class="role-badge"></span><span id="user-email"></span><a href="#" id="logout-link" class="nav-link">Log Out</a></nav>
     </div>
   </header>
 
   <main class="workspace">
-    <section class="workspace-header">
-      <div><p class="eyebrow" id="team-name">Workspace</p><h1>Prompt projects</h1><p>Build, version, and test production prompts with your team.</p></div>
-      <button id="new-prompt-button" class="btn btn-primary hidden">New prompt</button>
+    <section id="projects-view">
+      <div class="workspace-header"><div><p class="eyebrow" id="team-name">Workspace</p><h1>Prompt projects</h1><p>Build, version, test, and discuss production prompts with your team.</p></div><button id="new-prompt-button" class="btn btn-primary hidden">New prompt</button></div>
+      <section id="new-prompt-panel" class="workspace-panel hidden"><div class="panel-heading"><h2>Create prompt project</h2><button class="icon-button" data-close="new-prompt-panel" aria-label="Close">×</button></div><form id="new-prompt-form" class="inline-form"><label>Project name<input id="prompt-name" maxlength="120" required placeholder="Customer support assistant"></label><label>Description<input id="prompt-description" maxlength="300" placeholder="Purpose of this prompt"></label><button class="btn btn-primary" type="submit">Create project</button></form><p id="prompt-message" class="auth-msg"></p></section>
+      <section id="admin-panel" class="workspace-panel hidden"><div class="panel-heading"><div><h2>Invite team member</h2><p>Only administrators can invite people and assign roles.</p></div></div><form id="invite-form" class="invite-grid"><label>Full name<input id="invite-name" required maxlength="100" placeholder="Alex Morgan"></label><label>Email<input id="invite-email" type="email" required placeholder="alex@company.com"></label><label>Role<select id="invite-role"><option value="prompt_engineer">Prompt Engineer</option><option value="tester">Tester</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select></label><button class="btn btn-outline" type="submit">Send invitation</button></form><p id="invite-message" class="auth-msg"></p></section>
+      <section><div class="section-heading"><h2>All projects</h2><span id="project-count">0 projects</span></div><div id="prompts-list" class="project-grid"><div class="empty-state">Loading your workspace…</div></div></section>
     </section>
 
-    <section id="new-prompt-panel" class="workspace-panel hidden">
-      <div class="panel-heading"><h2>Create prompt project</h2><button class="icon-button" data-close="new-prompt-panel" aria-label="Close">×</button></div>
-      <form id="new-prompt-form" class="inline-form">
-        <label>Project name<input id="prompt-name" maxlength="120" required placeholder="Customer support assistant"></label>
-        <label>Description<input id="prompt-description" maxlength="300" placeholder="Purpose of this prompt"></label>
-        <button class="btn btn-primary" type="submit">Create project</button>
-      </form>
-      <p id="prompt-message" class="auth-msg"></p>
-    </section>
-
-    <section id="admin-panel" class="workspace-panel hidden">
-      <div class="panel-heading"><div><h2>Invite team member</h2><p>Only administrators can invite people and assign roles.</p></div></div>
-      <form id="invite-form" class="invite-grid">
-        <label>Full name<input id="invite-name" required maxlength="100" placeholder="Alex Morgan"></label>
-        <label>Email<input id="invite-email" type="email" required placeholder="alex@company.com"></label>
-        <label>Role<select id="invite-role"><option value="prompt_engineer">Prompt Engineer</option><option value="tester">Tester</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select></label>
-        <button class="btn btn-outline" type="submit">Send invitation</button>
-      </form>
-      <p id="invite-message" class="auth-msg"></p>
-    </section>
-
-    <section>
-      <div class="section-heading"><h2>All projects</h2><span id="project-count">0 projects</span></div>
-      <div id="prompts-list" class="project-grid"><div class="empty-state">Loading your workspace…</div></div>
+    <section id="editor-view" class="hidden">
+      <button id="back-projects" class="back-button">← All projects</button>
+      <div class="editor-header"><div><p class="eyebrow" id="editor-project-label"></p><h1 id="editor-project-name"></h1><p id="editor-project-description"></p></div><button id="new-branch-button" class="btn btn-outline hidden">New branch</button></div>
+      <section id="new-branch-panel" class="workspace-panel hidden"><form id="new-branch-form" class="inline-form"><label>Branch name<input id="branch-name" required maxlength="80" placeholder="experiment/tone"></label><span class="form-help">The new branch starts from the selected branch’s current version.</span><button class="btn btn-primary" type="submit">Create branch</button></form><p id="branch-message" class="auth-msg"></p></section>
+      <div class="editor-layout">
+        <aside class="branches-panel"><div class="panel-heading"><h2>Branches</h2></div><div id="branches-list" class="branches-list"></div></aside>
+        <section class="prompt-editor-panel"><div class="editor-toolbar"><div><span class="muted-label">Current branch</span><strong id="current-branch-name">—</strong></div><span id="editor-mode" class="role-badge"></span></div><textarea id="prompt-content" maxlength="100000" placeholder="Write your prompt template here. Use variables such as {{tone}}."></textarea><div id="commit-controls" class="commit-controls hidden"><input id="commit-message" maxlength="240" placeholder="Describe this version"><button id="commit-button" class="btn btn-primary">Commit version</button></div><p id="editor-message" class="auth-msg"></p></section>
+        <aside class="history-panel"><div class="panel-heading"><h2>Version history</h2></div><div id="history-list" class="history-list"></div></aside>
+      </div>
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
+  <button id="chat-toggle" class="chat-toggle" aria-expanded="false"><span>Team Chat</span><b id="chat-unread" class="hidden">0</b></button>
+  <aside id="chat-drawer" class="chat-drawer" aria-hidden="true">
+    <div class="chat-header"><div><h2>Team Chat</h2><p id="chat-team-name"></p></div><button id="chat-close" class="icon-button" aria-label="Close chat">×</button></div>
+    <div class="chat-tabs"><button class="chat-tab active" data-scope="team">Workspace</button><button id="project-chat-tab" class="chat-tab" data-scope="project" disabled>Project</button></div>
+    <div id="team-directory" class="team-directory"></div>
+    <div id="chat-messages" class="chat-messages"><div class="empty-state">Loading messages…</div></div>
+    <form id="chat-form" class="chat-form"><textarea id="chat-input" maxlength="2000" rows="2" placeholder="Message your team…" required></textarea><button class="btn btn-primary" type="submit">Send</button></form>
+    <p id="chat-message" class="auth-msg"></p>
+  </aside>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script src="js/app.js"></script>
 </body>
 </html>

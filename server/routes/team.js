@@ -23,6 +23,13 @@ router.get('/members', requireRole('admin'), async (req, res) => {
   return res.json(data);
 });
 
+router.get('/directory', async (req, res) => {
+  const { data, error } = await supabase.from('profiles')
+    .select('id, full_name, role').eq('team_id', req.user.team_id).order('full_name');
+  if (error) return res.status(500).json({ error: 'Team directory could not be loaded.' });
+  return res.json(data);
+});
+
 router.post('/invitations', requireRole('admin'), async (req, res) => {
   const email = String(req.body.email || '').trim().toLowerCase();
   const fullName = String(req.body.full_name || '').trim();

@@ -11,6 +11,30 @@ const { getPromptForTeam, getBranchForTeam, getCommitForTeam } = require('../ser
 // Everything in this file requires a logged-in user.
 router.use(authMiddleware);
 
+router.get('/', async (req, res) => {
+  const promptId = req.query.prompt_id;
+  if (!promptId || !(await getPromptForTeam(promptId, req.user.team_id))) {
+    return res.status(404).json({ error: 'Prompt not found.' });
+  }
+  const { data, error } = await supabase.from('branches')
+    .select('id, name, head_commit_id, created_at').eq('prompt_id', promptId).order('created_at');
+  if (error) return res.status(500).json({ error: 'Branches could not be loaded.' });
+  return res.json(data);
+});
+
+router.get('/:id', async (req, res) => {
+  const branch = await getBranchForTeam(req.params.id, req.user.team_id);
+  if (!branch) return res.status(404).json({ error: 'Branch not found.' });
+  let head = null;
+  if (branch.head_commit_id) {
+    const { data } = await supabase.from('commits')
+      .select('id, content, message, created_at, variables(key, default_value, description)')
+      .eq('id', branch.head_commit_id).maybeSingle();
+    head = data;
+  }
+  return res.json({ id: branch.id, name: branch.name, prompt_id: branch.prompt_id, head_commit_id: branch.head_commit_id, head });
+});
+
 /**
  * POST /api/branches
  * Create a new branch, optionally forked from an existing commit.
@@ -24,11 +48,13 @@ router.post('/', requireRole('admin', 'prompt_engineer'), async (req, res) => {
   }
   const prompt = await getPromptForTeam(prompt_id, req.user.team_id);
   if (!prompt) return res.status(404).json({ error: 'Prompt not found.' });
+  let sourceBranchId = null;
   if (from_commit_id) {
     const source = await getCommitForTeam(from_commit_id, req.user.team_id);
     if (!source || source.branches.prompt_id !== prompt_id) {
       return res.status(400).json({ error: 'Source commit does not belong to this prompt.' });
     }
+    sourceBranchId = source.branch_id;
   }
 
   const { data, error } = await supabase
@@ -38,6 +64,7 @@ router.post('/', requireRole('admin', 'prompt_engineer'), async (req, res) => {
       name,
       created_by: req.user.id,
       head_commit_id: from_commit_id || null,
+      created_from_branch_id: sourceBranchId,
     })
     .select()
     .single();
