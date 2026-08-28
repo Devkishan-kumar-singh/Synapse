@@ -146,12 +146,13 @@ router.post('/:id/rollback', requireRole('admin', 'prompt_engineer'), async (req
   if (!commit_id) {
     return res.status(400).json({ error: 'commit_id is required.' });
   }
-  const [branch, commit] = await Promise.all([
-    getBranchForTeam(branchId, req.user.team_id),
-    getCommitForTeam(commit_id, req.user.team_id),
-  ]);
-  const commitBranch = Array.isArray(commit?.branches) ? commit.branches[0] : commit?.branches;
-  if (!branch || !commit || !commitBranch || commitBranch.prompt_id !== branch.prompt_id) {
+  const branch = await getBranchForTeam(branchId, req.user.team_id);
+  const { data: targetCommit } = await supabase.from('commits')
+    .select('id, branch_id').eq('id', commit_id).maybeSingle();
+  const { data: targetBranch } = targetCommit
+    ? await supabase.from('branches').select('prompt_id').eq('id', targetCommit.branch_id).maybeSingle()
+    : { data: null };
+  if (!branch || !targetCommit || !targetBranch || targetBranch.prompt_id !== branch.prompt_id) {
     return res.status(400).json({ error: 'Rollback commit must belong to this prompt.' });
   }
 
