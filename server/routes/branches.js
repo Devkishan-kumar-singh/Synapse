@@ -51,7 +51,8 @@ router.post('/', requireRole('admin', 'prompt_engineer'), async (req, res) => {
   let sourceBranchId = null;
   if (from_commit_id) {
     const source = await getCommitForTeam(from_commit_id, req.user.team_id);
-    if (!source || source.branches.prompt_id !== prompt_id) {
+    const sourceBranch = Array.isArray(source?.branches) ? source.branches[0] : source?.branches;
+    if (!sourceBranch || sourceBranch.prompt_id !== prompt_id) {
       return res.status(400).json({ error: 'Source commit does not belong to this prompt.' });
     }
     sourceBranchId = source.branch_id;
@@ -141,8 +142,23 @@ router.post('/:id/rollback', requireRole('admin', 'prompt_engineer'), async (req
     getBranchForTeam(branchId, req.user.team_id),
     getCommitForTeam(commit_id, req.user.team_id),
   ]);
-  if (!branch || !commit || commit.branch_id !== branchId) {
-    return res.status(400).json({ error: 'Rollback commit must belong to this branch.' });
+  const commitBranch = Array.isArray(commit?.branches) ? commit.branches[0] : commit?.branches;
+  if (!branch || !commit || !commitBranch || commitBranch.prompt_id !== branch.prompt_id) {
+    return res.status(400).json({ error: 'Rollback commit must belong to this prompt.' });
+  }
+
+  let ancestorId = branch.head_commit_id;
+  let isAncestor = false;
+  let steps = 0;
+  while (ancestorId && steps < 1000) {
+    if (ancestorId === commit_id) { isAncestor = true; break; }
+    const { data: ancestor } = await supabase.from('commits')
+      .select('parent_commit_id').eq('id', ancestorId).maybeSingle();
+    ancestorId = ancestor?.parent_commit_id || null;
+    steps += 1;
+  }
+  if (!isAncestor) {
+    return res.status(400).json({ error: 'Rollback is allowed only to an earlier version in this branch history.' });
   }
 
   const { error } = await supabase
