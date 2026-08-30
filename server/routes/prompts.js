@@ -44,6 +44,15 @@ router.post('/', requireRole('admin', 'prompt_engineer'), async (req, res) => {
 
   if (branchError) return res.status(500).json({ error: branchError.message });
 
+  await supabase.from('audit_logs').insert({
+    team_id: req.user.team_id,
+    actor_id: req.user.id,
+    action: 'project_created',
+    target_type: 'prompt',
+    target_id: prompt.id,
+    metadata: { name: prompt.name, main_branch_id: branch.id },
+  });
+
   res.status(201).json({ ...prompt, main_branch: branch });
 });
 
