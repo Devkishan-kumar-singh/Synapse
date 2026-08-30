@@ -17,10 +17,30 @@ const chatRoutes = require('./routes/chat');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const supabaseOrigin = process.env.SUPABASE_URL
+  ? new URL(process.env.SUPABASE_URL).origin
+  : 'https://*.supabase.co';
+const supabaseRealtimeOrigin = supabaseOrigin.replace(/^https:/, 'wss:');
 
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", 'https://cdn.jsdelivr.net'],
+      styleSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'", supabaseOrigin, supabaseRealtimeOrigin],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+}));
 app.use(cors({ origin: process.env.APP_ORIGIN || `http://localhost:${PORT}` }));
 app.use(express.json({ limit: '256kb' }));
 app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: true, legacyHeaders: false }));
