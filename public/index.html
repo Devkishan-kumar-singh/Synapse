@@ -27,7 +27,7 @@
           <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </a>
         <a href="#arena" class="nav-link">A/B Testing Arena</a>
-        <a href="#docs" class="nav-link">Docs</a>
+        <a href="#demo" class="nav-link">Demo</a>
         <a href="login.html" class="nav-link">Team Login</a>
       </nav>
     </div>
@@ -45,7 +45,7 @@
           Optimize LLM Outputs with Collaborative A/B Testing.
         </p>
         <div class="hero-actions">
-          <a href="#arena" class="btn btn-primary">Launch A/B Arena</a>
+          <a href="login.html" class="btn btn-primary">Launch A/B Arena</a>
           <a href="#demo" class="btn btn-outline">Request Demo</a>
         </div>
       </div>
@@ -114,21 +114,21 @@
                 <div class="result-card result-blue">
                   <div class="result-head">
                     <span class="model-dot"></span>
-                    <span>GPT-4o</span>
+                    <span>Gemini 3.5 Flash</span>
                   </div>
                   <p>API Foundations lead the framework toward a broader adaptive strategy. It communicates the abstract concept clearly, while offering a modular pathway for the team&rsquo;s IMB workspace.</p>
                 </div>
                 <div class="result-card result-red">
                   <div class="result-head">
-                    <span>Claude 3.5 Sonnet</span>
+                    <span>Groq GPT-OSS 20B</span>
                   </div>
-                  <p>Claude&rsquo;s response is efficient and direct, capturing the intended structure with a slightly more compact and pragmatic tone across the same output frame.</p>
+                  <p>Groq&rsquo;s response is efficient and direct, capturing the intended structure with a compact and pragmatic tone across the same output frame.</p>
                 </div>
                 <div class="result-card result-blue small">
                   <p>Get 4-6 responses to compare, iterate, and refine side by side before promoting the winning variant to production.</p>
                 </div>
                 <div class="result-card result-red small">
-                  <p>Claude 3.5 Sonnet trims the response further, preserving the core intent while cutting redundant framing text.</p>
+                  <p>Groq GPT-OSS trims the response further, preserving the core intent while cutting redundant framing text.</p>
                 </div>
                 <div class="result-actions">
                   <button class="pill pill-blue">Commit</button>
@@ -165,12 +165,12 @@
           <p>Manage different prompt iterations like software code. Create, commit, merge, and rollback prompt versions to maintain quality.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="feature-card" id="arena">
           <div class="feature-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V5m0 14h6M4 5h6m10 14V9m0 10h-6m6-10h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </div>
           <h3>A/B Testing Arena</h3>
-          <p>Directly compare prompt variations against live inputs from GPT-4o, Claude 3.5 Sonnet, and other models side-by-side.</p>
+          <p>Directly compare prompt variations using Gemini and Groq side by side, then save the team&rsquo;s verdict.</p>
         </div>
 
         <div class="feature-card">
@@ -206,6 +206,13 @@
         </div>
 
       </div>
+    </div>
+  </section>
+
+  <section class="demo-cta" id="demo">
+    <div class="demo-cta-inner">
+      <div><p class="demo-kicker">LIVE PRODUCT DEMO</p><h2>See the complete Synapse workflow.</h2><p>Sign in securely to explore prompt projects, branches, team chat, audit history, and real Gemini-versus-Groq testing.</p></div>
+      <a href="login.html" class="btn btn-primary">Open Demo Workspace</a>
     </div>
   </section>
 
