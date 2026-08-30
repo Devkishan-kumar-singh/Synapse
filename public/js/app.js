@@ -1,14 +1,17 @@
 let session;
 let profile;
 let projects = [];
+let projectBranches = [];
 let currentProject = null;
 let currentBranch = null;
+let currentTestRunId = null;
 let chatScope = 'team';
 let chatChannel = null;
 let unreadCount = 0;
 
 const canEdit = () => ['admin', 'prompt_engineer'].includes(profile?.role);
 const canChat = () => ['admin', 'prompt_engineer', 'tester'].includes(profile?.role);
+const canTest = () => ['admin', 'prompt_engineer', 'tester'].includes(profile?.role);
 
 function setMessage(id, text, type = '') {
   const element = document.getElementById(id);
@@ -68,11 +71,13 @@ async function openProject(project) {
   document.getElementById('editor-project-description').textContent = project.description || 'No description provided.';
   document.getElementById('project-chat-tab').disabled = false;
   if (canEdit()) document.getElementById('new-branch-button').classList.remove('hidden');
+  document.getElementById('ab-test-panel').classList.toggle('hidden', !canTest());
   await loadBranches();
 }
 
 async function loadBranches(preferredId) {
   const branches = await api(`/api/branches?prompt_id=${encodeURIComponent(currentProject.id)}`);
+  projectBranches = branches;
   const list = document.getElementById('branches-list');
   list.replaceChildren();
   branches.forEach((branch) => {
@@ -86,6 +91,35 @@ async function loadBranches(preferredId) {
   if (target) await selectBranch(target);
 }
 
+async function loadABOptions() {
+  if (!canTest() || !projectBranches.length) return;
+  const histories = await Promise.all(projectBranches.map(async (branch) => ({
+    branch,
+    commits: await api(`/api/branches/${branch.id}/history`),
+  })));
+  const unique = new Map();
+  histories.forEach(({ branch, commits }) => commits.forEach((commit) => {
+    if (!unique.has(commit.id)) unique.set(commit.id, { ...commit, branch_name: branch.name });
+  }));
+  const commits = [...unique.values()];
+  const selectA = document.getElementById('test-commit-a');
+  const selectB = document.getElementById('test-commit-b');
+  const previousA = selectA.value;
+  const previousB = selectB.value;
+  selectA.replaceChildren(); selectB.replaceChildren();
+  commits.forEach((commit) => {
+    const label = `${commit.branch_name} · ${commit.message} · ${formatDate(commit.created_at)}`;
+    [selectA, selectB].forEach((select) => {
+      const option = document.createElement('option'); option.value = commit.id; option.textContent = label; select.append(option);
+    });
+  });
+  if (commits.some((commit) => commit.id === previousA)) selectA.value = previousA;
+  if (commits.some((commit) => commit.id === previousB)) selectB.value = previousB;
+  else if (commits[1]) selectB.value = commits[1].id;
+  document.getElementById('run-test-button').disabled = commits.length < 2;
+  setMessage('test-message', commits.length < 2 ? 'Create at least two saved versions before running an A/B test.' : '');
+}
+
 async function selectBranch(branchId) {
   currentBranch = await api(`/api/branches/${branchId}`);
   document.getElementById('current-branch-name').textContent = currentBranch.name;
@@ -95,6 +129,7 @@ async function selectBranch(branchId) {
   document.getElementById('commit-controls').classList.toggle('hidden', !canEdit());
   document.querySelectorAll('.branch-row').forEach((row) => row.classList.toggle('active', row.textContent === currentBranch.name));
   await loadHistory();
+  await loadABOptions();
 }
 
 async function loadHistory() {
@@ -201,6 +236,42 @@ document.getElementById('back-projects').addEventListener('click', () => { docum
 document.getElementById('new-branch-button').addEventListener('click', () => document.getElementById('new-branch-panel').classList.toggle('hidden'));
 document.getElementById('new-branch-form').addEventListener('submit', async (event) => { event.preventDefault(); setMessage('branch-message', 'Creating branch…'); try { const branch = await api('/api/branches', { method: 'POST', body: JSON.stringify({ prompt_id: currentProject.id, name: document.getElementById('branch-name').value, from_commit_id: currentBranch?.head_commit_id || null }) }); event.target.reset(); setMessage('branch-message', 'Branch created.', 'success'); await loadBranches(branch.id); } catch (error) { setMessage('branch-message', error.message, 'error'); } });
 document.getElementById('commit-button').addEventListener('click', async () => { const content = document.getElementById('prompt-content').value; const message = document.getElementById('commit-message').value.trim(); if (!content.trim() || !message) return setMessage('editor-message', 'Prompt content and commit message are required.', 'error'); setMessage('editor-message', 'Saving version…'); try { await api(`/api/branches/${currentBranch.id}/commit`, { method: 'POST', body: JSON.stringify({ content, message }) }); document.getElementById('commit-message').value = ''; setMessage('editor-message', 'Version committed.', 'success'); await selectBranch(currentBranch.id); } catch (error) { setMessage('editor-message', error.message, 'error'); } });
+document.getElementById('ab-test-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const commitA = document.getElementById('test-commit-a').value;
+  const commitB = document.getElementById('test-commit-b').value;
+  if (!commitA || !commitB || commitA === commitB) return setMessage('test-message', 'Choose two different saved versions.', 'error');
+  let variables;
+  try {
+    variables = JSON.parse(document.getElementById('test-variables').value || '{}');
+    if (!variables || Array.isArray(variables) || typeof variables !== 'object') throw new Error();
+  } catch { return setMessage('test-message', 'Template variables must be a valid JSON object, for example {"tone":"friendly"}.', 'error'); }
+  const button = document.getElementById('run-test-button');
+  button.disabled = true; setMessage('test-message', 'Running Gemini and Groq…');
+  document.getElementById('test-results').classList.add('hidden');
+  document.getElementById('test-verdict-controls').classList.add('hidden');
+  try {
+    const run = await api('/api/test-runs', { method: 'POST', body: JSON.stringify({
+      commit_a_id: commitA, commit_b_id: commitB,
+      provider_a: 'gemini', provider_b: 'groq', variables,
+    }) });
+    currentTestRunId = run.id;
+    document.getElementById('test-output-a').textContent = run.output_a || 'No response returned.';
+    document.getElementById('test-output-b').textContent = run.output_b || 'No response returned.';
+    document.getElementById('test-results').classList.remove('hidden');
+    document.getElementById('test-verdict-controls').classList.remove('hidden');
+    setMessage('test-message', 'A/B test completed.', 'success');
+  } catch (error) { setMessage('test-message', error.message, 'error'); }
+  finally { button.disabled = false; }
+});
+document.querySelectorAll('[data-verdict]').forEach((button) => button.addEventListener('click', async () => {
+  if (!currentTestRunId) return;
+  try {
+    await api(`/api/test-runs/${currentTestRunId}/verdict`, { method: 'PATCH', body: JSON.stringify({ verdict: button.dataset.verdict }) });
+    setMessage('test-message', button.dataset.verdict === 'commit' ? 'Result accepted.' : 'Test discarded.', 'success');
+    document.getElementById('test-verdict-controls').classList.add('hidden');
+  } catch (error) { setMessage('test-message', error.message, 'error'); }
+}));
 document.getElementById('chat-toggle').addEventListener('click', async () => { const drawer = document.getElementById('chat-drawer'); drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); document.getElementById('chat-toggle').setAttribute('aria-expanded', 'true'); unreadCount = 0; document.getElementById('chat-unread').classList.add('hidden'); await loadChat(); });
 document.getElementById('chat-close').addEventListener('click', () => { document.getElementById('chat-drawer').classList.remove('open'); document.getElementById('chat-drawer').setAttribute('aria-hidden', 'true'); document.getElementById('chat-toggle').setAttribute('aria-expanded', 'false'); });
 document.querySelectorAll('.chat-tab').forEach((tab) => tab.addEventListener('click', async () => { if (tab.disabled) return; chatScope = tab.dataset.scope; document.querySelectorAll('.chat-tab').forEach((item) => item.classList.toggle('active', item === tab)); document.getElementById('chat-input').placeholder = chatScope === 'project' ? `Message about ${currentProject.name}…` : 'Message your team…'; await loadChat(); }));

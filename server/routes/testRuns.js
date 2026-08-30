@@ -47,14 +47,14 @@ router.post('/', requireRole('admin', 'prompt_engineer', 'tester'), async (req, 
     // Fire both LLM calls in parallel — this is the "split-screen" comparison.
     const [outputA, outputB] = await Promise.all([
       callModel({
-        provider: provider_a || 'openai',
-        model: model_a || 'gpt-4o',
+        provider: provider_a || 'gemini',
+        model: model_a || process.env.GEMINI_MODEL || 'gemini-2.5-flash',
         promptTemplate: commitA.content,
         variables,
       }),
       callModel({
-        provider: provider_b || 'anthropic',
-        model: model_b || 'claude-3-5-sonnet-20241022',
+        provider: provider_b || 'groq',
+        model: model_b || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
         promptTemplate: commitB.content,
         variables,
       }),
@@ -66,10 +66,10 @@ router.post('/', requireRole('admin', 'prompt_engineer', 'tester'), async (req, 
         team_id: req.user.team_id,
         commit_a_id,
         commit_b_id,
-        model_a: model_a || 'gpt-4o',
-        model_b: model_b || 'claude-3-5-sonnet-20241022',
-        provider_a: provider_a || 'openai',
-        provider_b: provider_b || 'anthropic',
+        model_a: model_a || process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+        model_b: model_b || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+        provider_a: provider_a || 'gemini',
+        provider_b: provider_b || 'groq',
         input_payload: variables,
         output_a: outputA,
         output_b: outputB,
@@ -80,6 +80,11 @@ router.post('/', requireRole('admin', 'prompt_engineer', 'tester'), async (req, 
       .single();
 
     if (insertError) return res.status(500).json({ error: insertError.message });
+
+    await supabase.from('audit_logs').insert({
+      team_id: req.user.team_id, actor_id: req.user.id, action: 'test_run_created',
+      target_type: 'test_run', target_id: testRun.id,
+    });
 
     res.status(201).json(testRun);
   } catch (err) {

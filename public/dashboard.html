@@ -32,6 +32,24 @@
         <section class="prompt-editor-panel"><div class="editor-toolbar"><div><span class="muted-label">Current branch</span><strong id="current-branch-name">—</strong></div><span id="editor-mode" class="role-badge"></span></div><textarea id="prompt-content" maxlength="100000" placeholder="Write your prompt template here. Use variables such as {{tone}}."></textarea><div id="commit-controls" class="commit-controls hidden"><input id="commit-message" maxlength="240" placeholder="Describe this version"><button id="commit-button" class="btn btn-primary">Commit version</button></div><p id="editor-message" class="auth-msg"></p></section>
         <aside class="history-panel"><div class="panel-heading"><h2>Version history</h2></div><div id="history-list" class="history-list"></div></aside>
       </div>
+      <section id="ab-test-panel" class="workspace-panel ab-test-panel hidden">
+        <div class="panel-heading"><div><h2>A/B Testing Arena</h2><p>Compare two saved versions using Gemini and Groq.</p></div></div>
+        <form id="ab-test-form" class="ab-test-form">
+          <label>Version A · Gemini<select id="test-commit-a" required></select></label>
+          <label>Version B · Groq<select id="test-commit-b" required></select></label>
+          <label>Template variables (JSON)<input id="test-variables" value="{}" spellcheck="false"></label>
+          <button id="run-test-button" class="btn btn-primary" type="submit">Run A/B test</button>
+        </form>
+        <p id="test-message" class="auth-msg"></p>
+        <div id="test-results" class="test-results hidden">
+          <article class="test-result-card"><span class="muted-label">Gemini</span><pre id="test-output-a"></pre></article>
+          <article class="test-result-card"><span class="muted-label">Groq</span><pre id="test-output-b"></pre></article>
+        </div>
+        <div id="test-verdict-controls" class="test-verdict-controls hidden">
+          <button class="btn btn-primary" type="button" data-verdict="commit">Accept result</button>
+          <button class="btn btn-outline" type="button" data-verdict="discard">Discard test</button>
+        </div>
+      </section>
     </section>
   </main>
 
