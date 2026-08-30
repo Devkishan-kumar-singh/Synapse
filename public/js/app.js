@@ -8,6 +8,7 @@ let chatChannel = null;
 let unreadCount = 0;
 
 const canEdit = () => ['admin', 'prompt_engineer'].includes(profile?.role);
+const canChat = () => ['admin', 'prompt_engineer', 'tester'].includes(profile?.role);
 
 function setMessage(id, text, type = '') {
   const element = document.getElementById(id);
@@ -144,7 +145,9 @@ async function loadChat() {
   const list = document.getElementById('chat-messages');
   list.replaceChildren();
   if (!messages.length) {
-    const empty = document.createElement('div'); empty.className = 'empty-chat'; empty.textContent = 'No messages yet. Start the conversation.'; list.append(empty);
+    const empty = document.createElement('div'); empty.className = 'empty-chat';
+    empty.textContent = canChat() ? 'No messages yet. Start the conversation.' : 'No messages yet.';
+    list.append(empty);
   } else {
     messages.forEach((message) => {
       const item = document.createElement('div'); item.className = `chat-message-item${message.sender_id === profile.id ? ' mine' : ''}`;
@@ -180,6 +183,10 @@ async function init() {
   document.getElementById('role-badge').textContent = profile.role.replace('_', ' ');
   document.getElementById('team-name').textContent = profile.teams?.name || 'Team workspace';
   document.getElementById('chat-team-name').textContent = profile.teams?.name || 'Team workspace';
+  if (!canChat()) {
+    document.getElementById('chat-form').classList.add('hidden');
+    setMessage('chat-message', 'Viewer access is read-only. You can view chat history but cannot send messages.');
+  }
   if (canEdit()) document.getElementById('new-prompt-button').classList.remove('hidden');
   if (profile.role === 'admin') document.getElementById('admin-panel').classList.remove('hidden');
   await Promise.all([loadProjects(), loadDirectory(), loadChat()]);
@@ -197,7 +204,7 @@ document.getElementById('commit-button').addEventListener('click', async () => {
 document.getElementById('chat-toggle').addEventListener('click', async () => { const drawer = document.getElementById('chat-drawer'); drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); document.getElementById('chat-toggle').setAttribute('aria-expanded', 'true'); unreadCount = 0; document.getElementById('chat-unread').classList.add('hidden'); await loadChat(); });
 document.getElementById('chat-close').addEventListener('click', () => { document.getElementById('chat-drawer').classList.remove('open'); document.getElementById('chat-drawer').setAttribute('aria-hidden', 'true'); document.getElementById('chat-toggle').setAttribute('aria-expanded', 'false'); });
 document.querySelectorAll('.chat-tab').forEach((tab) => tab.addEventListener('click', async () => { if (tab.disabled) return; chatScope = tab.dataset.scope; document.querySelectorAll('.chat-tab').forEach((item) => item.classList.toggle('active', item === tab)); document.getElementById('chat-input').placeholder = chatScope === 'project' ? `Message about ${currentProject.name}…` : 'Message your team…'; await loadChat(); }));
-document.getElementById('chat-form').addEventListener('submit', async (event) => { event.preventDefault(); const input = document.getElementById('chat-input'); const body = input.value.trim(); if (!body) return; try { await api('/api/chat/messages', { method: 'POST', body: JSON.stringify({ body, project_id: chatScope === 'project' ? currentProject?.id : null }) }); input.value = ''; setMessage('chat-message', ''); await loadChat(); } catch (error) { setMessage('chat-message', error.message, 'error'); } });
+document.getElementById('chat-form').addEventListener('submit', async (event) => { event.preventDefault(); if (!canChat()) return setMessage('chat-message', 'Viewer access is read-only.', 'error'); const input = document.getElementById('chat-input'); const body = input.value.trim(); if (!body) return; try { await api('/api/chat/messages', { method: 'POST', body: JSON.stringify({ body, project_id: chatScope === 'project' ? currentProject?.id : null }) }); input.value = ''; setMessage('chat-message', ''); await loadChat(); } catch (error) { setMessage('chat-message', error.message, 'error'); } });
 document.getElementById('logout-link').addEventListener('click', async (event) => { event.preventDefault(); const client = await window.synapseReady; if (chatChannel) client.removeChannel(chatChannel); await client.auth.signOut(); window.location.replace('login.html'); });
 
 init().catch((error) => { document.getElementById('prompts-list').textContent = error.message; });

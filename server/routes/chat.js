@@ -1,6 +1,7 @@
 const express = require('express');
 const supabase = require('../services/supabaseClient');
 const authMiddleware = require('../middleware/authMiddleware');
+const requireRole = require('../middleware/roleMiddleware');
 const { getPromptForTeam } = require('../services/access');
 
 const router = express.Router();
@@ -22,7 +23,7 @@ router.get('/messages', async (req, res) => {
   return res.json(data.reverse());
 });
 
-router.post('/messages', async (req, res) => {
+router.post('/messages', requireRole('admin', 'prompt_engineer', 'tester'), async (req, res) => {
   const body = String(req.body.body || '').trim();
   const projectId = req.body.project_id || null;
   if (!body || body.length > 2000) return res.status(400).json({ error: 'Message must contain 1–2000 characters.' });
