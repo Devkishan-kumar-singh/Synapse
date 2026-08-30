@@ -15,11 +15,15 @@ async function getBranchForTeam(branchId, teamId) {
 }
 
 async function getCommitForTeam(commitId, teamId) {
-  const { data, error } = await supabase
+  const { data: commit, error } = await supabase
     .from('commits')
-    .select('*, branches!inner(prompt_id, prompts!inner(team_id))')
-    .eq('id', commitId).eq('branches.prompts.team_id', teamId).maybeSingle();
-  return error ? null : data;
+    .select('*')
+    .eq('id', commitId)
+    .maybeSingle();
+  if (error || !commit) return null;
+
+  const branch = await getBranchForTeam(commit.branch_id, teamId);
+  return branch ? commit : null;
 }
 
 module.exports = { getPromptForTeam, getBranchForTeam, getCommitForTeam };
